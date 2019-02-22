@@ -1,8 +1,9 @@
 const Token = artifacts.require("./ERC20Token.sol");
 const ICO = artifacts.require("./ICO.sol");
 
-var Web3 = require("web3");
-const web3 = new Web3("http://localhost:8545");
+let Web3 = require("web3");
+// const web3 = new Web3("http://localhost:8545");
+const web3 = new Web3("http://127.0.0.1:8545");
 
 contract("ICO", accounts => {
 
@@ -14,7 +15,7 @@ contract("ICO", accounts => {
     // const tokenInstance = await Token.deployed();
     // const icoInstance = await ICO.deployed();
 
-    let accounts = web3.eth.accounts;
+    let accounts = web3.eth.getAccounts();
     console.log(accounts);
     // let ownerAccount = accounts[0];
     // let userAccount = accounts[1];
