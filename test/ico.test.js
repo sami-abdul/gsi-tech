@@ -11,7 +11,7 @@ contract("ICO", accounts => {
     return _token / (10 ** 6);
   }
 
-  it("Should be possible for user to buy token using ether.",async () => {
+  it("Should be possible for user to buy token using ether.", async () => {
     // const tokenInstance = await Token.deployed();
     // const icoInstance = await ICO.deployed();
 
@@ -49,7 +49,7 @@ contract("ICO", accounts => {
     // let temp3 = await icoInstance.getICOBalance.call();
     // console.log("ico balance after loosing token ..... ", tokenToChacha(temp3).toString(decimal));
     // assert.equal(tokenToChacha(temp3).toString(decimal), 49.995, "ICO didnt dispatched the required amount");
-  
+
     // let userBalanceAfter = await tokenInstance.balanceOf.call(userAccount);
     // console.log("User token balance After buying token ..... ", userBalanceAfter.toString(decimal));
     // assert.equal(userBalanceAfter.toString(decimal), 5000, "user token transaction is unsuccessful");
