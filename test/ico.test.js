@@ -11,11 +11,11 @@ contract("ICO", accounts => {
     return _token / (10 ** 6);
   }
 
-  it("Should be possible for user to buy token using ether.", () => {
+  it("Should be possible for user to buy token using ether.",async () => {
     // const tokenInstance = await Token.deployed();
     // const icoInstance = await ICO.deployed();
 
-    let accounts = web3.eth.getAccounts();
+    let accounts = await web3.eth.getAccounts();
     console.log(accounts);
     // let ownerAccount = accounts[0];
     // let userAccount = accounts[1];
