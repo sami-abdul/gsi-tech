@@ -70,7 +70,7 @@ contract ERC20Token is ERC20, MinterRole {
         return true;
     }
 
-    function mint(address account, uint256 value) public  {
+    function mint(address account, uint256 value) public onlyMinter {
         require(account != address(0));
 
         _totalSupply = _totalSupply.add(value);

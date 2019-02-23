@@ -1,60 +1,60 @@
 const Token = artifacts.require("./ERC20Token.sol");
 const ICO = artifacts.require("./ICO.sol");
-
 let Web3 = require("web3");
-// const web3 = new Web3("http://localhost:8545");
+let utils = require('./functions');
+
 const web3 = new Web3("http://127.0.0.1:8545");
 
-contract("ICO", accounts => {
+const valueToInvest = 10;
+const etherRate = 10;
+const bitcoinRate = 50;
 
-  function tokenToChacha(_token) {
-    return _token / (10 ** 6);
-  }
+let transaction;
 
-  it("Should be possible for user to buy token using ether.", async () => {
-    // const tokenInstance = await Token.deployed();
-    // const icoInstance = await ICO.deployed();
+contract("ICO", () => {
 
-    let accounts = await web3.eth.getAccounts();
-    console.log(accounts);
-    // let ownerAccount = accounts[0];
-    // let userAccount = accounts[1];
-    // const decimal = 0;
-    // console.log("Owner account address ..... ", ownerAccount);
+    it("Should be possible for user to buy token using ether", async () => {
+        const tokenInstance = await Token.deployed();
+        const icoInstance = await ICO.deployed();
 
-    // let temp = await tokenInstance.balanceOf.call(ownerAccount);
-    // console.log("Owner balance initially ..... ", tokenToChacha(temp).toString(decimal));
-    // assert.equal(tokenToChacha(temp).toString(decimal), 100, "there is a problem in user owner initial balance");
+        let accounts = await web3.eth.getAccounts();
+        let userAccount = accounts[1];
 
-    // await tokenInstance.transfer(icoInstance.address, 50000000, {from: ownerAccount});
-    // let temp1 = await tokenInstance.balanceOf.call(ownerAccount);
-    // console.log("Owner balance after transfer to ICO ..... ", tokenToChacha(temp1).toString(decimal));
+        // Check initial balance.
+        let initialBalance = await tokenInstance.balanceOf.call(userAccount);
+        assert.equal(initialBalance.toNumber(), 0);
 
-    // let temp2 = await icoInstance.getICOBalance.call();
-    // console.log("ICO balance before loosing any token ..... ", tokenToChacha(temp2).toString(decimal));
-    // assert.equal(tokenToChacha(temp2).toString(decimal), 50, "ICO does'nt get right balance");
+        // Add ICO as token minter.
+        let minterResult = await tokenInstance.addMinter(icoInstance.address);
+        assert.equal(minterResult.logs[0].event, 'MinterAdded');
 
-    // let userBalance = await tokenInstance.balanceOf.call(userAccount);
-    // console.log("User token balance Before buying token ..... ", userBalance.toString(10));
-    // assert.equal(userBalance.toString(decimal), 0, "It should be Zero");
+        await icoInstance.buyTokensWithEther({
+            value: valueToInvest,
+            from: userAccount
+        });
 
-    // let userBal = await web3.eth.getBalance(userAccount);
-    // console.log("User Account balance before, in ether ..... ", web3.utils.fromWei(userBal, "ether"));
+        let finalBalance = await tokenInstance.balanceOf.call(userAccount);
+        assert.equal(finalBalance.toNumber(), valueToInvest * etherRate);
+    });
 
-    // await icoInstance.buyToken({
-    //   value: 500,
-    //   from: userAccount
-    // });
+    it("Should be possible for user to buy token using bitcoin", async () => {
+        transaction = await utils.generateBTCAddress('BTC', valueToInvest);
+        let verification = await utils.verifyTransactionBalance(transaction.publicAddress, valueToInvest);
+        if (verification) {
+            const tokenInstance = await Token.deployed();
+            const icoInstance = await ICO.deployed();
 
-    // let temp3 = await icoInstance.getICOBalance.call();
-    // console.log("ico balance after loosing token ..... ", tokenToChacha(temp3).toString(decimal));
-    // assert.equal(tokenToChacha(temp3).toString(decimal), 49.995, "ICO didnt dispatched the required amount");
+            let accounts = await web3.eth.getAccounts();
+            let userAccount = accounts[1];
 
-    // let userBalanceAfter = await tokenInstance.balanceOf.call(userAccount);
-    // console.log("User token balance After buying token ..... ", userBalanceAfter.toString(decimal));
-    // assert.equal(userBalanceAfter.toString(decimal), 5000, "user token transaction is unsuccessful");
+            // Check initial balance.
+            let initialBalance = await tokenInstance.balanceOf.call(userAccount);
+            assert.equal(initialBalance.toNumber(), 100);
 
-    // let userBal1 = await web3.eth.getBalance(userAccount);
-    // console.log("User Account balance after, in ether ..... ", web3.utils.fromWei(userBal1, "ether"));
-  });
-})
+            await icoInstance.buyTokensWithBitcoin(userAccount, valueToInvest);
+
+            let finalBalance = await tokenInstance.balanceOf.call(userAccount);
+            assert.equal(finalBalance.toNumber(), valueToInvest * bitcoinRate);
+        }
+    });
+});

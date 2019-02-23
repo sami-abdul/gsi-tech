@@ -11,7 +11,7 @@ contract MinterRole {
     Roles.Role private _minters;
 
     constructor () internal {
-        addMinter(msg.sender);
+        _minters.add(msg.sender);
     }
 
     modifier onlyMinter() {
@@ -23,7 +23,7 @@ contract MinterRole {
         return _minters.has(account);
     }
 
-    function addMinter(address account) public {
+    function addMinter(address account) public onlyMinter {
         _minters.add(account);
         emit MinterAdded(account);
     }
